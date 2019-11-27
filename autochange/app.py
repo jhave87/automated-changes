@@ -3,14 +3,15 @@ import threading
 from filehandler import watcher, processing
 
 event_queue = queue.Queue()
-
-# Set up a worker thread to process database load
-worker = threading.Thread(target=processing.process_queue, args=(event_queue,))
-worker.setDaemon(True)
-worker.start()
-
+abort_event = threading.Event()
 path = "C:\\Users\\B050080\\Documents\\Python Scripts"
 patterns = ["*.xml"]
 
+# Set up a worker thread to process database load
+worker = threading.Thread(target=processing.process_queue,
+                          args=(event_queue, abort_event, path,))
+worker.setDaemon(True)
+worker.start()
+
 w = watcher.Watcher()
-w.run(path, event_queue, match_patterns=patterns)
+w.run(path, event_queue, abort_event, match_patterns=patterns)

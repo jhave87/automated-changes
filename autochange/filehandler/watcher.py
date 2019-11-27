@@ -15,7 +15,7 @@ class Watcher():
     def __init__(self):
         self.observer = Observer()
 
-    def run(self, dir_to_watch, event_queue,
+    def run(self, dir_to_watch, event_queue, abort_event,
             match_patterns=None, ignore_dir=True):
         '''
         The run method starts an observation of a given directory.
@@ -24,6 +24,7 @@ class Watcher():
         Args:
             dir_to_watch (str): Path to dir that should be observed
             event_queue: Queue object to place file event objects
+            abort_event: An thread event used to abort if other threads fail
             match_patterns (list): Patterns for filenames
             ignore_dir (bool): Ignore directories
 
@@ -38,12 +39,14 @@ class Watcher():
         self.observer.start()
 
         try:
-            while True:
+            while not abort_event.is_set():
                 time.sleep(5)
         except KeyboardInterrupt:
             self.observer.stop()
             print(f"Observation of {dir_to_watch} has been stopped")
 
+        print("The program is aborting")
+        self.observer.stop()
         self.observer.join()
 
 
