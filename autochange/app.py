@@ -4,7 +4,7 @@ from filehandler import watcher, processing
 
 event_queue = queue.Queue()
 abort_event = threading.Event()
-path = "C:\\Users\\B050080\\Documents\\Python Scripts"
+path = "C:\\Users\\B050080\\Documents\\Code\\Python"
 patterns = ["*.xml"]
 
 # Set up a worker thread to process database load

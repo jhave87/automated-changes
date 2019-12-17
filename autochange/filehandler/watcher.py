@@ -1,5 +1,5 @@
 import time
-from watchdog.observers import Observer
+from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
 from . import errorhandler
 
@@ -15,7 +15,7 @@ class Watcher():
 
     '''
     def __init__(self, with_warning=True):
-        self.observer = Observer()
+        self.observer = PollingObserver()
         self.with_warning = with_warning
 
     def run(self, dir_to_watch, event_queue, stop_event,
@@ -40,6 +40,7 @@ class Watcher():
                                dir_to_watch,
                                recursive=False)
         self.observer.start()
+        print(f"Observation of {dir_to_watch} has started")
 
         try:
             while not stop_event.is_set():

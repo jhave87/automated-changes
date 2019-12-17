@@ -1,6 +1,19 @@
 import os
 import time
 import logging
+import xml.etree.ElementTree as ET
+
+
+def do_something(filename):
+    time.sleep(1)
+    name_list = filename.split('.')
+    new_filename = name_list[0] + '1.' + name_list[1]
+    tree = ET.parse(filename)
+    tree.write(new_filename)
+    #root = tree.getroot()
+    #for child in root:
+    #    if child.text is not None:
+    #        print((child.tag, child.text))
 
 
 def process_queue(queue, abort_event, log_path):
@@ -30,12 +43,11 @@ def process_queue(queue, abort_event, log_path):
 
     while True:
         if not queue.empty():
-            time.sleep(0.5)
             event = queue.get()
-
             logging.info(f"Started processing {event.src_path}")
 
             # call something that handles the file
+            do_something(event.src_path)
 
             # store processed files
             path, fname = os.path.split(event.src_path)
