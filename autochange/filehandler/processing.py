@@ -30,6 +30,7 @@ def process_queue(queue, abort_event, log_path):
 
     while True:
         if not queue.empty():
+            time.sleep(0.5)
             event = queue.get()
 
             logging.info(f"Started processing {event.src_path}")

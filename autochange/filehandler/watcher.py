@@ -1,6 +1,7 @@
 import time
 from watchdog.observers import Observer
 from watchdog.events import PatternMatchingEventHandler
+from . import errorhandler
 
 
 class Watcher():
@@ -10,12 +11,14 @@ class Watcher():
 
     Attributes:
         observer: Observer object used for event handling
+        with_warning (bool): If true warnings will be send
 
     '''
-    def __init__(self):
+    def __init__(self, with_warning=True):
         self.observer = Observer()
+        self.with_warning = with_warning
 
-    def run(self, dir_to_watch, event_queue, abort_event,
+    def run(self, dir_to_watch, event_queue, stop_event,
             match_patterns=None, ignore_dir=True):
         '''
         The run method starts an observation of a given directory.
@@ -39,11 +42,14 @@ class Watcher():
         self.observer.start()
 
         try:
-            while not abort_event.is_set():
+            while not stop_event.is_set():
                 time.sleep(5)
         except KeyboardInterrupt:
             self.observer.stop()
             print(f"Observation of {dir_to_watch} has been stopped")
+
+        if self.with_warning:
+            errorhandler.send_warning("jonashave87@gmail.com")
 
         print("The program is aborting")
         self.observer.stop()
