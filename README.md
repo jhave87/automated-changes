@@ -5,7 +5,9 @@ can then be processed according to what is needed.
 
 ## Installation
 The package is currently not in PyPi, but can be installed by running:
+
 ```pip install git+https://github.com/jhave87/automated-changes.git```
+
 Alternatively, the package can be installed by cloning the repository and running `pip install .` in the base directory.
 
 ## Using Autochange
