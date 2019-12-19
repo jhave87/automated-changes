@@ -1,19 +1,14 @@
 import os
 import time
 import logging
+import requests
 import xml.etree.ElementTree as ET
 
 
 def do_something(filename):
     time.sleep(1)
-    name_list = filename.split('.')
-    new_filename = name_list[0] + '1.' + name_list[1]
-    tree = ET.parse(filename)
-    tree.write(new_filename)
-    #root = tree.getroot()
-    #for child in root:
-    #    if child.text is not None:
-    #        print((child.tag, child.text))
+    path, fname = os.path.split(filename)
+
 
 
 def process_queue(queue, abort_event, log_path):
@@ -54,7 +49,7 @@ def process_queue(queue, abort_event, log_path):
             new_path = os.path.join(log_path, 'processed_files', fname)
 
             try:
-                os.rename(event.src_path, new_path)   
+                os.rename(event.src_path, new_path)
                 # log the operation has been completed successfully
                 logging.info(f"Finished processing {event.src_path}")
             except FileExistsError:
