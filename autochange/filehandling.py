@@ -1,7 +1,54 @@
+import os
 import time
+import logging
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
-from . import errorhandler
+
+
+def process_queue(queue, abort_event, log_path):
+    '''
+    The function process_events_queue monitors a queue of file events
+    and processes the events one at a time. The processsed files will
+    be moved to a processed file folder in the log_path directory. The
+    function is meant to be run by a Daemon thread, otherwise it will
+    run infinitely.
+
+    Args:
+        queue: Queue object containing file events
+        stop_event: Event to stop main thread if processing fails
+        log_path: Path to dir where log and processed files are stored
+
+    '''
+    # setup loggin configs
+    log_name = os.path.join(log_path, 'processed_files.log')
+    logging.basicConfig(filename=log_name,
+                        level=logging.INFO,
+                        format='%(levelname)s: %(asctime)s - %(message)s',
+                        datefmt='%Y/%m/%d %H:%M:%S')
+
+    # check if processed_files folder exists, otherwise create it
+    if not os.path.exists(os.path.join(log_path, 'processed_files')):
+        os.mkdir(os.path.join(log_path, 'processed_files'))
+
+    while True:
+        if not queue.empty():
+            event = queue.get()
+            logging.info(f"Started processing {event.src_path}")
+
+            # call something that handles the file
+
+            # store processed files
+            path, fname = os.path.split(event.src_path)
+            new_path = os.path.join(log_path, 'processed_files', fname)
+
+            try:
+                os.rename(event.src_path, new_path)
+                # log the operation has been completed successfully
+                logging.info(f"Finished processing {event.src_path}")
+            except FileExistsError:
+                logging.error(f"File {new_path} already exists ")
+                abort_event.set()
+                break
 
 
 class Watcher():
@@ -14,9 +61,8 @@ class Watcher():
         with_warning (bool): If true warnings will be send
 
     '''
-    def __init__(self, with_warning=True):
+    def __init__(self):
         self.observer = PollingObserver()
-        self.with_warning = with_warning
 
     def run(self, dir_to_watch, event_queue, stop_event,
             match_patterns=None, ignore_dir=True):
@@ -48,9 +94,6 @@ class Watcher():
         except KeyboardInterrupt:
             self.observer.stop()
             print(f"Observation of {dir_to_watch} has been stopped")
-
-        if self.with_warning:
-            errorhandler.send_warning("jonashave87@gmail.com")
 
         print("The program is aborting")
         self.observer.stop()

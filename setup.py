@@ -4,11 +4,11 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="autochange-joh", # Replace with your own username
-    version="0.0.1",
+    name="autochange-joh",
+    version="0.0.2",
     author="Jonas Have",
     author_email="joh@sik.dk",
-    description="A small package that monitors a directory for xml files and provides output to an RPA process.",
+    description="A small package that set up monitoring of directories for xml files. The xml files are used to provide an output to a RPA service.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/jhave87/automated-changes",
