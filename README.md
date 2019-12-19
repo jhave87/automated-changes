@@ -4,7 +4,9 @@ When new files are created in the directory, a file event is added to an event q
 can then be processed according to what is needed.
 
 ## Installation
-The package is currently not in PyPi, but can be installed by running [`pip install git+https://github.com/jhave87/automated-changes.git`], or by cloning the repository and running `pip install`. in the base directory.
+The package is currently not in PyPi, but can be installed by running:
+```pip install git+https://github.com/jhave87/automated-changes.git```
+Alternatively, the package can be installed by cloning the repository and running `pip install .` in the base directory.
 
 ## Using Autochange
 A typical use example is included in the `use_template.py`.
