@@ -8,7 +8,7 @@ The package is currently not in PyPi, but can be installed by running:
 
 ```pip install git+https://github.com/jhave87/automated-changes.git```
 
-Alternatively, the package can be installed by cloning the repository and running `pip install .` in the base directory.
+Alternatively, the package can be installed by cloning the repository and running `pip install .` from the base directory.
 
 ## Using Autochange
-A typical use example is included in the `use_template.py`.
+A typical use example is included in the `use_template.py` script in the base directory.

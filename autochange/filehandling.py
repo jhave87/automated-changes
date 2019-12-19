@@ -5,7 +5,7 @@ from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
 
 
-def process_queue(queue, abort_event, log_path):
+def process_queue(process_func, queue, abort_event, log_path):
     '''
     The function process_events_queue monitors a queue of file events
     and processes the events one at a time. The processsed files will
@@ -14,6 +14,7 @@ def process_queue(queue, abort_event, log_path):
     run infinitely.
 
     Args:
+        process_func: Function expression. Should handle a single input file.
         queue: Queue object containing file events
         stop_event: Event to stop main thread if processing fails
         log_path: Path to dir where log and processed files are stored
@@ -36,6 +37,7 @@ def process_queue(queue, abort_event, log_path):
             logging.info(f"Started processing {event.src_path}")
 
             # call something that handles the file
+            process_func(event.src_path)
 
             # store processed files
             path, fname = os.path.split(event.src_path)
