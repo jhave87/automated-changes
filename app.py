@@ -1,6 +1,6 @@
 import queue
 import threading
-from filehandler import watcher, processing
+from autochange import watcher, processing
 
 event_queue = queue.Queue()
 abort_event = threading.Event()
