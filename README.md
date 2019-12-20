@@ -11,4 +11,4 @@ The package is currently not in PyPi, but can be installed by running:
 Alternatively, the package can be installed by cloning the repository and running `pip install .` from the base directory.
 
 ## Using Autochange
-A typical use example is included in the `use_template.py` script in the base directory.
+A typical use example is included in the `run_template.py` script in the base directory.

@@ -6,13 +6,22 @@ Python script illustrating the use of the autochange package!
 # imports
 import autochange.run
 
-# initialize variables
+# initialize variables and functions
 path = "C:\\Users\\B050080\\Documents"
 patterns = ["*.xml"]
 
 
-# setup file processsing
-process_func = 1
+def process_func(file):
+    '''
+    Function that processes files.
+
+    Arg:
+        file (str): Path to file.
+
+    '''
+
+    print(file)
 
 
+# run the autochange package
 autochange.run.run(path, patterns, process_func)
