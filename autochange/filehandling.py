@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+from datetime import datetime
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
 
@@ -21,7 +22,8 @@ def process_queue(process_func, queue, abort_event, log_path):
 
     '''
     # setup loggin configs
-    log_name = os.path.join(log_path, 'processed_files.log')
+    dtm = now.strftime("%m%d%YT%H%M%S")
+    log_name = os.path.join(log_path, f"processed_files_{dtm}.log")
     logging.basicConfig(filename=log_name,
                         level=logging.INFO,
                         format='%(levelname)s: %(asctime)s - %(message)s',
@@ -30,6 +32,8 @@ def process_queue(process_func, queue, abort_event, log_path):
     # check if processed_files folder exists, otherwise create it
     if not os.path.exists(os.path.join(log_path, 'processed_files')):
         os.mkdir(os.path.join(log_path, 'processed_files'))
+    if not os.path.exists(os.path.join(log_path, 'failed_files')):
+        os.mkdir(os.path.join(log_path, 'failed_files'))
 
     while True:
         if not queue.empty():
@@ -37,16 +41,22 @@ def process_queue(process_func, queue, abort_event, log_path):
             logging.info(f"Started processing {event.src_path}")
 
             # call something that handles the file
-            process_func(event.src_path)
+            success = process_func(event.src_path)
 
             # store processed files
             path, fname = os.path.split(event.src_path)
-            new_path = os.path.join(log_path, 'processed_files', fname)
+            if success:
+                new_path = os.path.join(log_path, 'processed_files', fname)
+            else:
+                new_path = os.path.join(log_path, 'failed_files', fname)
 
             try:
                 os.rename(event.src_path, new_path)
                 # log the operation has been completed successfully
-                logging.info(f"Finished processing {event.src_path}")
+                if success:
+                    logging.info(f"Finished processing {event.src_path}")
+                else:
+                    logging.info(f"Failed processing {event.src_path}")
             except FileExistsError:
                 logging.error(f"File {new_path} already exists ")
                 abort_event.set()
