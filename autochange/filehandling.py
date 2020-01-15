@@ -22,7 +22,7 @@ def process_queue(process_func, queue, abort_event, log_path):
 
     '''
     # setup loggin configs
-    dtm = now.strftime("%m%d%YT%H%M%S")
+    dtm = datetime.now().strftime("%m%d%YT%H%M%S")
     log_name = os.path.join(log_path, f"processed_files_{dtm}.log")
     logging.basicConfig(filename=log_name,
                         level=logging.INFO,
