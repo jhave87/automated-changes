@@ -21,20 +21,21 @@ def process_queue(process_func, queue, abort_event, log_path):
         log_path: Path to dir where log and processed files are stored
 
     '''
-    # setup loggin configs
-    dtm = datetime.now().strftime("%m%d%YT%H%M%S")
-    log_name = os.path.join(log_path, f"processed_files_{dtm}.log")
-    logging.basicConfig(filename=log_name,
-                        level=logging.INFO,
-                        format='%(levelname)s: %(asctime)s - %(message)s',
-                        datefmt='%Y/%m/%d %H:%M:%S')
-
     # check if processed_files folder exists, otherwise create it
     if not os.path.exists(os.path.join(log_path, 'processed_files')):
         os.mkdir(os.path.join(log_path, 'processed_files'))
     if not os.path.exists(os.path.join(log_path, 'failed_files')):
         os.mkdir(os.path.join(log_path, 'failed_files'))
+    if not os.path.exists(os.path.join(log_path, 'logs')):
+        os.mkdir(os.path.join(log_path, 'logs'))
 
+    # setup loggin configs
+    dtm = datetime.now().strftime("%m%d%YT%H%M%S")
+    log_name = os.path.join(log_path, 'logs', f"processed_files_{dtm}.log")
+    logging.basicConfig(filename=log_name,
+                        level=logging.INFO,
+                        format='%(levelname)s: %(asctime)s - %(message)s',
+                        datefmt='%Y/%m/%d %H:%M:%S')
     while True:
         if not queue.empty():
             event = queue.get()
@@ -61,6 +62,8 @@ def process_queue(process_func, queue, abort_event, log_path):
                 logging.error(f"File {new_path} already exists ")
                 abort_event.set()
                 break
+        else:
+            time.sleep(1)
 
 
 class Watcher():
