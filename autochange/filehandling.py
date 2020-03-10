@@ -6,6 +6,52 @@ from watchdog.observers.polling import PollingObserver
 from watchdog.events import PatternMatchingEventHandler
 
 
+def logSetup(file_name):
+    """
+    Function for setting up a new log to track the case creation process
+    and for logging unhandled exceptions.
+
+    Args:
+    file_name (str): Filename and path to the log file
+
+    Returns:
+    logger: Custom logger to track progress
+
+    """
+    # Create a custom logger
+    logger = logging.getLogger(__name__)
+
+    # Setup file handler
+    f_handler = logging.FileHandler(file_name)
+    f_handler.setLevel(logging.INFO)
+    f_format = logging.Formatter('%(levelname)s: %(asctime)s - %(message)s',
+                                 '%Y/%m/%d %H:%M:%S')
+    f_handler.setFormatter(f_format)
+
+    # Setup custom handler
+    c_handler = logging.StreamHandler(stream=sys.stdout)
+    c_format = logging.Formatter('%(levelname)s: %(asctime)s - %(message)s',
+                                 '%Y/%m/%d %H:%M:%S')
+    c_handler.setFormatter(c_format)
+
+    # Define function to log uncaught exceptions
+    def handle_exception(exc_type, exc_value, exc_traceback):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)
+            return
+
+        logger.error("Uncaught exception",
+                     exc_info=(exc_type, exc_value, exc_traceback))
+    # Add hook to use the handle exception function when uncaught
+    # exceptions happen
+    sys.excepthook = handle_exception
+
+    # Add handlers to the logger and return the logger
+    logger.addHandler(f_handler)
+    logger.addHandler(c_handler)
+    return logger
+
+
 def process_queue(process_func, queue, abort_event, log_path):
     '''
     The function process_events_queue monitors a queue of file events
@@ -30,16 +76,13 @@ def process_queue(process_func, queue, abort_event, log_path):
         os.mkdir(os.path.join(log_path, 'logs'))
 
     # setup loggin configs
-    dtm = datetime.now().strftime("%m%d%YT%H%M%S")
     log_name = os.path.join(log_path, 'logs', f"processed_files_{dtm}.log")
-    logging.basicConfig(filename=log_name,
-                        level=logging.INFO,
-                        format='%(levelname)s: %(asctime)s - %(message)s',
-                        datefmt='%Y/%m/%d %H:%M:%S')
+    logger = logSetup(log_name)
+
     while True:
         if not queue.empty():
             event = queue.get()
-            logging.info(f"Started processing {event.src_path}")
+            logger.info(f"Started processing {event.src_path}")
 
             # call something that handles the file
             success = process_func(event.src_path)
@@ -55,13 +98,14 @@ def process_queue(process_func, queue, abort_event, log_path):
                 os.rename(event.src_path, new_path)
                 # log the operation has been completed successfully
                 if success:
-                    logging.info(f"Finished processing {event.src_path}")
+                    logger.info(f"Finished processing {event.src_path}")
                 else:
-                    logging.info(f"Failed processing {event.src_path}")
+                    logger.info(f"Failed processing {event.src_path}")
             except FileExistsError:
-                logging.error(f"File {new_path} already exists ")
+                logger.error(f"File {new_path} already exists ")
                 abort_event.set()
                 break
+            queue.task_done()
         else:
             time.sleep(1)
 
