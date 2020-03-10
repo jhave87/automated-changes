@@ -76,6 +76,7 @@ def process_queue(process_func, queue, abort_event, log_path):
         os.mkdir(os.path.join(log_path, 'logs'))
 
     # setup loggin configs
+    dtm = datetime.now().strftime("%m%d%YT%H%M%S")
     log_name = os.path.join(log_path, 'logs', f"processed_files_{dtm}.log")
     logger = logSetup(log_name)
 
