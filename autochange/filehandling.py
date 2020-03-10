@@ -21,10 +21,10 @@ def logSetup(file_name):
     """
     # Create a custom logger
     logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
 
     # Setup file handler
     f_handler = logging.FileHandler(file_name)
-    f_handler.setLevel(logging.INFO)
     f_format = logging.Formatter('%(levelname)s: %(asctime)s - %(message)s',
                                  '%Y/%m/%d %H:%M:%S')
     f_handler.setFormatter(f_format)
@@ -40,13 +40,12 @@ def logSetup(file_name):
         if issubclass(exc_type, KeyboardInterrupt):
             sys.__excepthook__(exc_type, exc_value, exc_traceback)
             return
-
         logger.error("Uncaught exception",
                      exc_info=(exc_type, exc_value, exc_traceback))
     # Add hook to use the handle exception function when uncaught
     # exceptions happen
     sys.excepthook = handle_exception
-
+    
     # Add handlers to the logger and return the logger
     logger.addHandler(f_handler)
     logger.addHandler(c_handler)
