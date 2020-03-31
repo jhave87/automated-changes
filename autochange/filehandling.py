@@ -82,6 +82,7 @@ def process_queue(process_func, queue, abort_event, log_path):
 
     while True:
         if not queue.empty():
+            time.sleep(5)
             event = queue.get()
             logger.info(f"Started processing {event.src_path}")
 
@@ -89,6 +90,7 @@ def process_queue(process_func, queue, abort_event, log_path):
             success = process_func(event.src_path)
 
             # store processed files
+            time.sleep(5)
             path, fname = os.path.split(event.src_path)
             if success:
                 new_path = os.path.join(log_path, 'processed_files', fname)
@@ -108,7 +110,7 @@ def process_queue(process_func, queue, abort_event, log_path):
                 break
             queue.task_done()
         else:
-            time.sleep(1)
+            time.sleep(5)
 
 
 class Watcher():
