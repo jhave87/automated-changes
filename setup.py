@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="autochange-joh",
-    version="0.1.4",
+    version="0.1.5",
     author="Jonas Have",
     author_email="joh@sik.dk",
     description="A small package that set up monitoring of directories for xml files. The xml files are used to provide an output to a RPA service.",

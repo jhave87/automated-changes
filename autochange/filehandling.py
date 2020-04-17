@@ -180,6 +180,7 @@ class QueueHandler(PatternMatchingEventHandler):
     def __init__(self, queue, patterns, ignore_dir):
         PatternMatchingEventHandler.__init__(self, patterns=patterns,
                                              ignore_directories=ignore_dir)
+        self.file_cache = {}
         self.queue = queue
 
     def add_to_queue(self, event):
@@ -204,4 +205,10 @@ class QueueHandler(PatternMatchingEventHandler):
         if event.is_directory:
             return None
         else:
-            self.add_to_queue(event)
+            seconds = int(time.time())
+            key = (seconds, event.src_path)
+            if key in self.file_cache:
+                return None
+            else:
+                self.file_cache[key] = True
+                self.add_to_queue(event)
